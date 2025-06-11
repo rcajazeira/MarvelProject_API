@@ -1,11 +1,10 @@
-const publicKey = 'ce24dfc4a1f1386baacffce0107b990784';
-const privateKey = 'fb9c3c82bcbfae8726b4203c7ae0c647ad2a0e0'; // CHAVE PRIVADA CORRIGIDA AQUI
+const publicKey = 'ce24dfc4a1f1386baacffce0107b990784'; // Sua chave pública correta
+const privateKey = 'fb9c3c82bcbfae8726b4203c7ae0c647ad2a0e0'; // Sua chave privada correta
 const apiUrl = 'https://gateway.marvel.com/v1/public/';
 
 async function fetchData(endpoint, params = {}) {
     const ts = new Date().getTime();
-    // A função md5() precisa ser definida ou importada. A incluí no final deste arquivo.
-    const hash = md5(ts + privateKey + publicKey);
+    const hash = md5(ts + privateKey + publicKey); // Gera o hash com as chaves corretas
     const url = new URL(apiUrl + endpoint);
 
     url.searchParams.append('apikey', publicKey);
@@ -19,13 +18,17 @@ async function fetchData(endpoint, params = {}) {
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            // Se houver um erro 401, a mensagem será mais específica
+            if (response.status === 401) {
+                throw new Error(`Erro de autenticação (401 Unauthorized). Verifique suas chaves e domínios autorizados na conta Marvel Developer.`);
+            }
+            throw new Error(`Erro HTTP! status: ${response.status}`);
         }
         const data = await response.json();
         return data.data.results;
     } catch (error) {
         console.error('Erro ao buscar dados da Marvel API:', error);
-        displayMessage('Erro ao carregar dados da Marvel.');
+        displayMessage('Erro ao carregar dados da Marvel. ' + error.message);
         return [];
     }
 }
@@ -43,15 +46,13 @@ function displayResults(results) {
         const itemDiv = document.createElement('div');
         itemDiv.classList.add('search-results__item');
 
-        // Use 'placeholder.jpg' se a imagem não estiver disponível
-        let thumbnailPath = 'placeholder.jpg';
+        // Use 'placeholder.jpg' se a imagem não estiver disponível ou for a genérica "image_not_available"
+        let thumbnailPath = 'placeholder.jpg'; // Defina um placeholder padrão
         if (item.thumbnail && item.thumbnail.path && !item.thumbnail.path.includes('image_not_available')) {
             thumbnailPath = `${item.thumbnail.path}.${item.thumbnail.extension}`;
         }
         
-        // Determinar o tipo de item para exibir informações específicas
-        // É importante que o `_type` seja definido no `handleSearch` antes de chamar `displayResults`
-        let itemType = item._type || ''; // Certifique-se que _type foi adicionado
+        let itemType = item._type || '';
         let title = item.name || item.title || 'Título Desconhecido';
         let description = '';
         let additionalInfo = '';
@@ -78,7 +79,7 @@ function displayResults(results) {
             detailLink = item.urls?.find(url => url.type === 'detail')?.url || '#';
             additionalInfo += `<p>Início: ${item.startYear || 'N/A'} - Fim: ${item.endYear || 'N/A'}</p>`;
         }
-        // Você pode expandir para 'stories' e 'events' aqui
+        // Adicione lógica para 'stories' e 'events' se quiser exibi-los
 
         itemDiv.innerHTML = `
             <img src="${thumbnailPath}" alt="${title}">
@@ -139,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // FUNÇÃO MD5 (NECESSÁRIA PARA A AUTENTICAÇÃO DA API MARVEL)
-// Por ser uma função utilitária, pode ser colocada no final do arquivo ou em um arquivo separado.
+// Esta função é uma implementação padrão de MD5 em JavaScript.
 function md5(string) {
     function RotateLeft(l, bits) {
         return (l << bits) | (l >>> (32 - bits));
