@@ -1,13 +1,29 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite App</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marvel Universe Explorer</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <main>
+        <header class="application-header">
+            <div class="logo-container">
+                <img src="https://i0.wp.com/cloud.estacaonerd.com/wp-content/uploads/2019/03/14122530/marvel.jpg?fit=2560%2C1440&ssl=1" alt="Logo Marvel" class="marvel-logo">
+                <h1 class="text-large">Universo Marvel</h1>
+            </div>
+            <form class="form-container" id="search-form">
+                <div class="input-container">
+                    <input type="search" id="search-input" placeholder="Buscar personagens, quadrinhos, séries...">
+                    <button type="submit" class="btn btn-primary">Pesquisar</button>
+                </div>
+            </form>
+        </header>
+        <section class="search-results" id="search-results">
+            <div class="loader"></div>
+        </section>
+    </main>
+    <script src="src/main.js"></script>
+</body>
 </html>
