@@ -1,11 +1,11 @@
-const publicKey = 'ce24fdfc4a1f1386baacffce0107b990784';
-const privateKey = 'f8bc3d7bcffbae87726b4703b7aed064c47ad9e0';
+const publicKey = 'ce24dfc4a1f1386baacffce0107b990784';
+const privateKey = 'fb9c3c82bcbfae8726b4203c7ae0c647ad2a0e0'; // CHAVE PRIVADA CORRIGIDA AQUI
 const apiUrl = 'https://gateway.marvel.com/v1/public/';
 
 async function fetchData(endpoint, params = {}) {
     const ts = new Date().getTime();
     // A função md5() precisa ser definida ou importada. A incluí no final deste arquivo.
-    const hash = md5(ts + privateKey + publicKey); 
+    const hash = md5(ts + privateKey + publicKey);
     const url = new URL(apiUrl + endpoint);
 
     url.searchParams.append('apikey', publicKey);
@@ -13,7 +13,7 @@ async function fetchData(endpoint, params = {}) {
     url.searchParams.append('hash', hash);
 
     for (const key in params) {
-        url.searchParams.append(key, params[key]); // Corrigido aqui: params[key] ao invés de params
+        url.searchParams.append(key, params[key]);
     }
 
     try {
@@ -43,13 +43,15 @@ function displayResults(results) {
         const itemDiv = document.createElement('div');
         itemDiv.classList.add('search-results__item');
 
-        let thumbnailPath = 'placeholder.jpg'; // Placeholder padrão
+        // Use 'placeholder.jpg' se a imagem não estiver disponível
+        let thumbnailPath = 'placeholder.jpg';
         if (item.thumbnail && item.thumbnail.path && !item.thumbnail.path.includes('image_not_available')) {
             thumbnailPath = `${item.thumbnail.path}.${item.thumbnail.extension}`;
         }
         
         // Determinar o tipo de item para exibir informações específicas
-        let itemType = item._type || '';
+        // É importante que o `_type` seja definido no `handleSearch` antes de chamar `displayResults`
+        let itemType = item._type || ''; // Certifique-se que _type foi adicionado
         let title = item.name || item.title || 'Título Desconhecido';
         let description = '';
         let additionalInfo = '';
@@ -103,6 +105,7 @@ function showLoader() {
 
 async function handleSearch(searchTerm) {
     showLoader();
+    // Adicionando _type para identificar o tipo de resultado na displayResults
     const characterResults = await fetchData('characters', { nameStartsWith: searchTerm, limit: 10 });
     const comicResults = await fetchData('comics', { titleStartsWith: searchTerm, limit: 10 });
     const seriesResults = await fetchData('series', { titleStartsWith: searchTerm, limit: 10 });
@@ -134,7 +137,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     displayMessage('Explore o Universo Marvel! Digite para pesquisar personagens, quadrinhos e séries.');
 });
-
 
 // FUNÇÃO MD5 (NECESSÁRIA PARA A AUTENTICAÇÃO DA API MARVEL)
 // Por ser uma função utilitária, pode ser colocada no final do arquivo ou em um arquivo separado.
@@ -171,22 +173,22 @@ function md5(string) {
     function FF(a, b, c, d, x, s, ac) {
         a = AddUnsigned(a, AddUnsigned(AddUnsigned(F(b, c, d), x), ac));
         return AddUnsigned(RotateLeft(a, s), b);
-    };
+    }
 
     function GG(a, b, c, d, x, s, ac) {
         a = AddUnsigned(a, AddUnsigned(AddUnsigned(G(b, c, d), x), ac));
         return AddUnsigned(RotateLeft(a, s), b);
-    };
+    }
 
     function HH(a, b, c, d, x, s, ac) {
         a = AddUnsigned(a, AddUnsigned(AddUnsigned(H(b, c, d), x), ac));
         return AddUnsigned(RotateLeft(a, s), b);
-    };
+    }
 
     function II(a, b, c, d, x, s, ac) {
         a = AddUnsigned(a, AddUnsigned(AddUnsigned(I(b, c, d), x), ac));
         return AddUnsigned(RotateLeft(a, s), b);
-    };
+    }
 
     function ConvertToWordArray(string) {
         var lWordCount;
@@ -208,7 +210,7 @@ function md5(string) {
         lWordArray[lNumberOfWords - 2] = lMessageLength << 3;
         lWordArray[lNumberOfWords - 1] = lMessageLength >>> 29;
         return lWordArray;
-    };
+    }
 
     function WordToHex(lValue) {
         var WordToHexValue = "", WordToHexValue_temp = "", lByte, lCount;
@@ -218,7 +220,7 @@ function md5(string) {
             WordToHexValue = WordToHexValue + WordToHexValue_temp.substr(WordToHexValue_temp.length - 2, 2);
         }
         return WordToHexValue;
-    };
+    }
 
     var x = Array();
     var k, AA, BB, CC, DD, a, b, c, d;
