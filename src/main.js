@@ -1,8 +1,8 @@
 // backend/server.js - Proxy seguro para Marvel API
-const express = require('express');
-const cors = require('cors');
-const crypto = require('crypto');
-const fetch = require('node-fetch'); // Certifique-se de instalar node-fetch: npm install node-fetch
+import express from 'express';
+import cors from 'cors';
+import crypto from 'crypto';
+import fetch from 'node-fetch';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -26,22 +26,30 @@ function generateMarvelHash(ts, privateKey, publicKey) {
 function buildMarvelUrl(endpoint, queryParams) {
     const ts = new Date().getTime().toString();
     const hash = generateMarvelHash(ts, PRIVATE_KEY, PUBLIC_KEY);
-    const url = new URL(API_URL + endpoint);
-    url.searchParams.append('apikey', PUBLIC_KEY);
-    url.searchParams.append('ts', ts);
-    url.searchParams.append('hash', hash);
+    
+    // Construir URL corretamente
+    const baseUrl = new URL(API_URL);
+    const endpointUrl = new URL(endpoint, baseUrl);
+    
+    // Adicionar parâmetros de autenticação
+    endpointUrl.searchParams.append('apikey', PUBLIC_KEY);
+    endpointUrl.searchParams.append('ts', ts);
+    endpointUrl.searchParams.append('hash', hash);
 
+    // Adicionar outros parâmetros de consulta
     Object.entries(queryParams).forEach(([key, value]) => {
-        url.searchParams.append(key, value);
+        endpointUrl.searchParams.append(key, value);
     });
 
-    return url;
+    return endpointUrl;
 }
 
 // Handler genérico para endpoints da Marvel API
 async function handleMarvelRequest(req, res, endpoint) {
     try {
         const url = buildMarvelUrl(endpoint, req.query);
+        console.log('Request URL:', url.toString()); // Para depuração
+        
         const response = await fetch(url);
         if (!response.ok) {
             const errorBody = await response.text();
@@ -64,28 +72,3 @@ app.get('/api/series', (req, res) => handleMarvelRequest(req, res, 'series'));
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
-
-
-// package.json
-/*
-{
-  "name": "marvel-api-proxy",
-  "version": "1.0.0",
-  "description": "Proxy seguro para Marvel API",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
-  },
-  "dependencies": {
-    "express": "^4.18.2",
-    "cors": "^2.8.5",
-    "node-fetch": "^3.3.1"
-  },
-  "devDependencies": {
-    "nodemon": "^3.0.1"
-  },
-  "type": "module"
-}
-
-*/
