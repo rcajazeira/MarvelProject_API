@@ -1,10 +1,10 @@
-const publicKey = 'ce24dfc4af1386baacfce0107b990784'; // Sua chave pública correta
-const privateKey = 'fb9c3c82bcfbae8726b4203c7ae0c647ad2a06e0'; // Sua chave privada correta
+const publicKey = 'ce24dfc4a1f1386baacffce0107b990784'; // Esta é a chave pública EXATA da sua conta
+const privateKey = 'fb9c3c82bcbfae8726b4203c7ae0c647ad2a0e0'; // Esta é a chave privada EXATA da sua conta
 const apiUrl = 'https://gateway.marvel.com/v1/public/';
 
 async function fetchData(endpoint, params = {}) {
     const ts = new Date().getTime();
-    const hash = md5(ts + privateKey + publicKey); // Gera o hash com as chaves corretas
+    const hash = md5(ts + privateKey + publicKey);
     const url = new URL(apiUrl + endpoint);
 
     url.searchParams.append('apikey', publicKey);
@@ -18,7 +18,6 @@ async function fetchData(endpoint, params = {}) {
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            // Se houver um erro 401, a mensagem será mais específica
             if (response.status === 401) {
                 throw new Error(`Erro de autenticação (401 Unauthorized). Verifique suas chaves e domínios autorizados na conta Marvel Developer.`);
             }
@@ -46,8 +45,7 @@ function displayResults(results) {
         const itemDiv = document.createElement('div');
         itemDiv.classList.add('search-results__item');
 
-        // Use 'placeholder.jpg' se a imagem não estiver disponível ou for a genérica "image_not_available"
-        let thumbnailPath = 'placeholder.jpg'; // Defina um placeholder padrão
+        let thumbnailPath = 'placeholder.jpg';
         if (item.thumbnail && item.thumbnail.path && !item.thumbnail.path.includes('image_not_available')) {
             thumbnailPath = `${item.thumbnail.path}.${item.thumbnail.extension}`;
         }
@@ -79,7 +77,6 @@ function displayResults(results) {
             detailLink = item.urls?.find(url => url.type === 'detail')?.url || '#';
             additionalInfo += `<p>Início: ${item.startYear || 'N/A'} - Fim: ${item.endYear || 'N/A'}</p>`;
         }
-        // Adicione lógica para 'stories' e 'events' se quiser exibi-los
 
         itemDiv.innerHTML = `
             <img src="${thumbnailPath}" alt="${title}">
@@ -106,11 +103,9 @@ function showLoader() {
 
 async function handleSearch(searchTerm) {
     showLoader();
-    // Adicionando _type para identificar o tipo de resultado na displayResults
     const characterResults = await fetchData('characters', { nameStartsWith: searchTerm, limit: 10 });
     const comicResults = await fetchData('comics', { titleStartsWith: searchTerm, limit: 10 });
     const seriesResults = await fetchData('series', { titleStartsWith: searchTerm, limit: 10 });
-    // Adicione mais tipos de busca se desejar (events, stories, creators)
 
     const allResults = [
         ...characterResults.map(c => ({ ...c, _type: 'characters' })),
@@ -132,7 +127,7 @@ document.addEventListener('DOMContentLoaded', () => {
             handleSearch(searchTerm);
         } else {
             displayMessage('Digite algo para pesquisar no Universo Marvel.');
-            document.getElementById('search-results').innerHTML = ''; // Limpa resultados anteriores
+            document.getElementById('search-results').innerHTML = '';
         }
     });
 
@@ -140,7 +135,6 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // FUNÇÃO MD5 (NECESSÁRIA PARA A AUTENTICAÇÃO DA API MARVEL)
-// Esta função é uma implementação padrão de MD5 em JavaScript.
 function md5(string) {
     function RotateLeft(l, bits) {
         return (l << bits) | (l >>> (32 - bits));
