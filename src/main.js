@@ -1,5 +1,5 @@
-const publicKey = 'ce24dfc4a1f1386baacffce0107b990784'; // Sua chave pública correta
-const privateKey = 'fb9c3c82bcbfae8726b4203c7ae0c647ad2a0e0'; // Sua chave privada correta
+const publicKey = 'ce24dfc4af1386baacfce0107b990784'; // Sua chave pública correta
+const privateKey = 'fb9c3c82bcfbae8726b4203c7ae0c647ad2a06e0'; // Sua chave privada correta
 const apiUrl = 'https://gateway.marvel.com/v1/public/';
 
 async function fetchData(endpoint, params = {}) {
