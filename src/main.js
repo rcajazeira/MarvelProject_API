@@ -1,4 +1,48 @@
-const publicKey = 'ce24fdfc4a1f1386baacffce0107b990784';
+// Adicione a biblioteca crypto-js ao seu projeto
+// Você pode fazer isso adicionando a seguinte linha ao seu arquivo HTML:
+// <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+
+function md5(str) {
+    return CryptoJS.MD5(str).toString();
+}
+
+const publicKey = 'ce24dfc4af1386baacfce0107b990784';
+const privateKey = 'fb9c3c82bcfbae8726b4203c7ae0c647ad2a06e0';
+const apiUrl = 'https://gateway.marvel.com/v1/public/';
+
+async function fetchData(endpoint, params = {}) {
+    const ts = new Date().getTime();
+    const hash = md5(ts + privateKey + publicKey);
+    const url = new URL(apiUrl + endpoint);
+
+    url.searchParams.append('apikey', publicKey);
+    url.searchParams.append('ts', ts);
+    url.searchParams.append('hash', hash);
+
+    for (const key in params) {
+        url.searchParams.append(key, params[key]);
+    }
+
+    try {
+        const response = await fetch(url);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        return data.data.results;
+    } catch (error) {
+        console.error('Erro ao buscar dados da Marvel API:', error);
+        return [];
+    }
+}
+
+// Exemplo de uso
+fetchData('characters')
+    .then(data => console.log(data))
+    .catch(error => console.error(error));
+
+
+/* const publicKey = 'ce24fdfc4a1f1386baacffce0107b990784';
 const privateKey = 'f8bc3d7bcffbae87726b4703b7aed064c47ad9e0';
 const apiUrl = 'https://gateway.marvel.com/v1/public/';
 
@@ -182,3 +226,4 @@ function md5(string) {
 
     return WordToHex(a) + WordToHex(b) + WordToHex(c) + WordToHex(d);
 }
+ */
