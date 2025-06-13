@@ -1,14 +1,33 @@
-// Adicione a biblioteca crypto-js ao seu projeto
-// Você pode fazer isso adicionando a seguinte linha ao seu arquivo HTML:
-// <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
-
-function md5(str) {
-    return CryptoJS.MD5(str).toString();
-}
-
-const publicKey = 'ce24dfc4af1386baacfce0107b990784';
-const privateKey = 'fb9c3c82bcfbae8726b4203c7ae0c647ad2a06e0';
+const publicKey = 'ce24fdfc4a1f1386baacffce0107b990784';
+const privateKey = 'f8bc3d7bcffbae87726b4703b7aed064c47ad9e0';
 const apiUrl = 'https://gateway.marvel.com/v1/public/';
+
+document.getElementById('search-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const query = document.getElementById('search-input').value.trim();
+    const resultsContainer = document.getElementById('search-results');
+
+    if (!query) return;
+
+    resultsContainer.innerHTML = '<div class="loader"></div>';
+
+    const results = await fetchData('characters', { nameStartsWith: query });
+
+    if (results.length === 0) {
+        resultsContainer.innerHTML = '<p class="message">Nenhum personagem encontrado.</p>';
+        return;
+    }
+
+    resultsContainer.innerHTML = results.map(character => `
+        <div class="search-results__item">
+            <img src="${character.thumbnail.path}.${character.thumbnail.extension}" alt="${character.name}">
+            <div class="search-results__item-info">
+                <h2>${character.name}</h2>
+                <p>${character.description || 'Sem descrição disponível.'}</p>
+            </div>
+        </div>
+    `).join('');
+});
 
 async function fetchData(endpoint, params = {}) {
     const ts = new Date().getTime();
@@ -26,20 +45,20 @@ async function fetchData(endpoint, params = {}) {
     try {
         const response = await fetch(url);
         if (!response.ok) {
-            throw new Error(`HTTP error! status: ${response.status}`);
+            throw new Error(`Erro HTTP: ${response.status}`);
         }
         const data = await response.json();
         return data.data.results;
     } catch (error) {
         console.error('Erro ao buscar dados da Marvel API:', error);
+        document.getElementById('search-results').innerHTML = `<p class="message">Erro ao buscar dados. Tente novamente mais tarde.</p>`;
         return [];
     }
 }
 
-// Exemplo de uso
-fetchData('characters')
-    .then(data => console.log(data))
-    .catch(error => console.error(error));
+// Sua função md5 permanece igual aqui
+// (cole a função md5 completa que você já tem)
+
 
 
 /* const publicKey = 'ce24fdfc4a1f1386baacffce0107b990784';
